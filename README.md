@@ -1,0 +1,114 @@
+<p align="center">
+  <img src="https://img.shields.io/badge/Python-3.11+-3776AB?style=for-the-badge&logo=python&logoColor=white" />
+  <img src="https://img.shields.io/badge/FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white" />
+  <img src="https://img.shields.io/badge/Supabase-3FCF8E?style=for-the-badge&logo=supabase&logoColor=white" />
+  <img src="https://img.shields.io/badge/SQLAlchemy-D71F00?style=for-the-badge&logo=sqlalchemy&logoColor=white" />
+  <img src="https://img.shields.io/badge/MQTT-660066?style=for-the-badge&logo=mqtt&logoColor=white" />
+  <img src="https://img.shields.io/badge/ESP32-E7352C?style=for-the-badge&logo=espressif&logoColor=white" />
+</p>
+
+<h1 align="center">🅿️ Smart Parking Management System</h1>
+
+<p align="center">
+  <b>Hệ thống quản lý bãi đỗ xe thông minh</b><br/>
+  Dự án môn học Hệ thống nhúng — Backend chính
+</p>
+
+<p align="center">
+  <a href="docs/GETTING_STARTED.md">🚀 Bắt đầu</a> •
+  <a href="docs/PROJECT_STRUCTURE.md">📁 Cấu trúc dự án</a> •
+  <a href="docs/GIT_WORKFLOW.md">🔀 Quy trình Git</a>
+</p>
+
+---
+
+## 📋 Giới Thiệu
+
+Hệ thống quản lý bãi đỗ xe thông minh sử dụng **cảm biến hồng ngoại + ESP32** để phát hiện trạng thái ô đỗ theo thời gian thực, kết hợp **nhận diện biển số xe** để tự động kiểm soát ra/vào và tính phí.
+
+> **Repo này** chứa **backend chính** của hệ thống. Module nhận diện biển số xe (LPR) nằm ở [repo riêng](#).
+
+---
+
+
+
+## 📦 Các Module
+
+| # | Nhóm Module | Mô tả | Phụ trách |
+|---|------------|--------|-----------|
+| 1 | **Data Acquisition** 📡 | Thu thập dữ liệu cảm biến hồng ngoại qua MQTT, lọc nhiễu, kiểm tra heartbeat | Chính |
+| 2 | **Recognition & Access** 🚗 | Nhận diện biển số, đối soát, điều khiển barie, ghi log ra/vào | Bằng, Hùng *(repo riêng)* |
+| 3 | **Parking Core** 🅿️ | Quản lý ô đỗ, cập nhật trạng thái real-time, tính giá | Tùng |
+| 4 | **User & Reservation** 👤 | Đăng ký/đăng nhập, quản lý profile, đặt chỗ trước | Hùng, Chiến |
+| 5 | **Payment** 💳 | Tạo hóa đơn, tích hợp thanh toán, lưu lịch sử giao dịch | Chiến |
+| 6 | **UI & Analytics** 📊 | Dashboard user/admin, báo cáo, hệ thống cảnh báo | Chính |
+| 7 | **Utilities** 🔧 | Thông báo (loa + OLED), bản đồ bãi xe | Chính |
+
+> [!NOTE]
+> Module 2 (LPR Engine) chạy riêng, giao tiếp với backend qua **REST API**.
+
+---
+
+## 🛠️ Tech Stack
+
+| Layer | Công nghệ |
+|-------|-----------|
+| **Language** | Python 3.11+ |
+| **Framework** | FastAPI |
+| **ORM** | SQLAlchemy |
+| **Database** | Supabase (PostgreSQL) |
+| **Package Manager** | [UV](https://docs.astral.sh/uv/) |
+| **Type Checker** | [ty](https://docs.astral.sh/ty/) |
+| **Linter** | [Ruff](https://docs.astral.sh/ruff/) |
+| **IoT Protocol** | MQTT |
+| **Hardware** | ESP32 + Cảm biến hồng ngoại |
+
+---
+
+## 🚀 Quick Start
+
+```bash
+# Clone repo
+git clone <repo-url>
+cd parking-management-system
+
+# Cài đặt dependencies với UV
+uv sync
+
+# Copy file env mẫu
+cp .env.example .env
+# Chỉnh sửa .env với thông tin Supabase & MQTT
+
+# Chạy dev server
+uv run fastapi dev src/app/main.py
+```
+
+👉 Xem chi tiết tại [**docs/GETTING_STARTED.md**](docs/GETTING_STARTED.md)
+
+---
+
+## 📚 Tài Liệu
+
+| File | Nội dung |
+|------|----------|
+| [📁 PROJECT_STRUCTURE.md](docs/PROJECT_STRUCTURE.md) | Cấu trúc thư mục, tổ chức code, hướng dẫn thêm mới |
+| [🔀 GIT_WORKFLOW.md](docs/GIT_WORKFLOW.md) | Luật push code, quy trình PR, commit convention |
+| [🚀 GETTING_STARTED.md](docs/GETTING_STARTED.md) | Hướng dẫn cài đặt & khởi động dự án |
+
+---
+
+## 👥 Thành Viên
+
+| Thành viên | Module phụ trách |
+|-----------|-----------------|
+| **Chính** | Data Acquisition · UI & Analytics · Utilities |
+| **Tùng** | Parking Core |
+| **Hùng** | Recognition & Access (Lead) · User & Reservation |
+| **Chiến** | User & Reservation · Payment |
+| **Bằng** | Recognition & Access |
+
+---
+
+<p align="center">
+  <sub>Built with ❤️ for Hệ thống nhúng</sub>
+</p>
