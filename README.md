@@ -17,7 +17,7 @@
 
 Hệ thống quản lý bãi đỗ xe thông minh sử dụng **cảm biến hồng ngoại + ESP32** để phát hiện trạng thái ô đỗ theo thời gian thực, kết hợp **nhận diện biển số xe** để tự động kiểm soát ra/vào và tính phí.
 
-> **Repo này** chứa **backend chính** của hệ thống. Module nhận diện biển số xe (LPR) nằm ở [repo riêng](#).
+> **Repo này** chứa **backend chính** của hệ thống. Module nhận diện biển số xe (LPR) nằm ở [repo riêng](https://github.com/smart-parking-lab/parking-lpr-service).
 
 ---
 
