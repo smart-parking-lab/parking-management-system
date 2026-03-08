@@ -15,7 +15,7 @@ class RegisterRequest(BaseModel):
     password: str
     full_name: str
     phone: Optional[str]
-    role_id: Optional[int] = 1
+    role_name: Optional[str] = "User"
 
     @field_validator("password")
     @classmethod
@@ -55,11 +55,10 @@ class TokenResponse(BaseModel):
 
 
 class UserResponse(BaseModel):
-    id: int
     email: str
     full_name: str
     phone: Optional[str] = None
-    role_id: Optional[int] = None
+    role_name: Optional[str] = None
 
     model_config = ConfigDict(from_attributes=True)
 

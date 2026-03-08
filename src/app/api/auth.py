@@ -27,17 +27,14 @@ def login(payload: LoginRequest, db: Session = Depends(get_db)):
 @router.get("/me", response_model=UserResponse)
 def get_me(request: Request, db: Session = Depends(get_db)):
     user_payload = request.state.user
-    user_id = int(user_payload.get("sub"))
-    user = db.query(User).filter(User.id == user_id).first()
-    if not user:
-        raise HTTPException(status_code=404, detail="User không tồn tại")
-    return user
+    user_id = user_payload.get("sub")
+    return auth_services.get_me(db, user_id)
 
 @router.post("/change-password")
 def change_password(request: Request, payload: ChangePasswordRequest, db: Session = Depends(get_db)):
     http_validate_change_password(payload.new_password, payload.check_password)
     user_payload = request.state.user
-    user_id = int(user_payload.get("sub"))
+    user_id = user_payload.get("sub")
     user = db.query(User).filter(User.id == user_id).first()
     if not user:
         raise HTTPException(status_code=404, detail="User không tồn tại")

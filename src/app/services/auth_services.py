@@ -3,8 +3,8 @@ from sqlalchemy import or_
 from sqlalchemy.orm import Session
 from fastapi import HTTPException
 
-from src.app.model.user import User
-from src.app.schemas.auth import RegisterRequest, LoginRequest, TokenResponse
+from src.app.model import User,Role
+from src.app.schemas.auth import RegisterRequest, LoginRequest, TokenResponse, UserResponse
 from src.app.core.security import create_access_token, create_refresh_token, verify_refresh_token
 
 
@@ -12,12 +12,14 @@ def _hash_password(password: str) -> str:
     return hashlib.sha256(password.encode()).hexdigest()
 
 
-def register(db: Session, payload: RegisterRequest) -> User:   
+def register(db: Session, payload: RegisterRequest) -> UserResponse:   
 
     existing = db.query(User).filter(User.email == payload.email).first()
+    role = db.query(Role).filter(Role.name == payload.role_name).first()
     if existing:
         raise HTTPException(status_code=400, detail="Email đã được sử dụng")
-
+    if not role:
+        raise HTTPException(status_code=404, detail="Role không tồn tại")
     hashed_pw = _hash_password(payload.password)
 
     new_user = User(
@@ -25,13 +27,19 @@ def register(db: Session, payload: RegisterRequest) -> User:
         password=hashed_pw,
         full_name=payload.full_name,
         phone=payload.phone,
-        role_id=payload.role_id,
+        role_id=role.id,
     )
 
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
-    return new_user
+    
+    return UserResponse(
+        email=new_user.email,
+        full_name=new_user.full_name,
+        phone=new_user.phone,
+        role_name=role.name
+    )
 
 
 
@@ -44,7 +52,7 @@ def login(db: Session, payload: LoginRequest) -> TokenResponse:
     if user.password != hashed_pw:
         raise HTTPException(status_code=401, detail="Email hoặc mật khẩu không đúng")
 
-    token_data = {"sub": str(user.id), "email": user.email, "role_id": user.role_id}
+    token_data = {"sub": str(user.id), "email": user.email, "role_id": str(user.role_id) if user.role_id else None}
 
     access_token = create_access_token(token_data)
     refresh_token = create_refresh_token(token_data)
@@ -54,7 +62,22 @@ def login(db: Session, payload: LoginRequest) -> TokenResponse:
         refresh_token=refresh_token,
     )
 
-def change_password(db: Session, user_id: int, password: str, new_password: str) -> dict:
+def get_me(db: Session, user_id: str) -> UserResponse:
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User không tồn tại")
+        
+    role = db.query(Role).filter(Role.id == user.role_id).first()
+    role_name = role.name if role else None
+    
+    return UserResponse(
+        email=user.email,
+        full_name=user.full_name,
+        phone=user.phone,
+        role_name=role_name
+    )
+    
+def change_password(db: Session, user_id: str, password: str, new_password: str) -> dict:
     user = db.query(User).filter(User.id == user_id).first()
     if not user:
         raise HTTPException(status_code=404, detail="User không tồn tại")
@@ -76,7 +99,7 @@ def refresh_access_token(db: Session, refresh_token: str) -> dict:
     if not user:
         raise HTTPException(status_code=404, detail="User không tồn tại")
     
-    token_data = {"sub": str(user.id), "email": user.email, "role_id": user.role_id}
+    token_data = {"sub": str(user.id), "email": user.email, "role_id": str(user.role_id) if user.role_id else None}
     access_token = create_access_token(token_data)
     
     return {
