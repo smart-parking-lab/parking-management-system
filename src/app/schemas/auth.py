@@ -7,6 +7,7 @@ from src.app.validators.auth_validator import (
     validate_full_name,
     validate_phone,
     validate_email_login,
+    validate_email,
 )
 
 
@@ -15,7 +16,7 @@ class RegisterRequest(BaseModel):
     password: str
     full_name: str
     phone: Optional[str]
-    role_id: Optional[int] = 1
+    role_name: Optional[str] = "User"
 
     @field_validator("password")
     @classmethod
@@ -47,6 +48,24 @@ class LoginRequest(BaseModel):
     def password_not_empty(cls, v: str) -> str:
         return validate_password_login(v)
 
+class UPdatedProfileRequest(BaseModel):
+    email: EmailStr
+    full_name: str
+    phone: Optional[str]
+
+    @field_validator("email")
+    @classmethod
+    def email_or_phone_valid(cls, v: str) -> str:
+        return validate_email(v)
+    @field_validator("full_name")
+    @classmethod
+    def full_name_valid(cls, v: str) -> str:
+        return validate_full_name(v)
+
+    @field_validator("phone")
+    @classmethod
+    def phone_valid(cls, v: Optional[str]) -> Optional[str]:
+        return validate_phone(v)
 
 class TokenResponse(BaseModel):
     access_token: str
@@ -55,11 +74,10 @@ class TokenResponse(BaseModel):
 
 
 class UserResponse(BaseModel):
-    id: int
     email: str
     full_name: str
     phone: Optional[str] = None
-    role_id: Optional[int] = None
+    role_name: Optional[str] = None
 
     model_config = ConfigDict(from_attributes=True)
 

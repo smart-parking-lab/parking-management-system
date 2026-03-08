@@ -82,6 +82,7 @@ erDiagram
 | `id` | `uuid` | PK | = Supabase Auth UID |
 | `email` | `varchar(255)` | UNIQUE, NOT NULL | Email đăng nhập |
 | `full_name` | `varchar(100)` | NOT NULL | Họ tên |
+|'password'| `varchar(100)` | NOT NULL | mật khẩu |
 | `phone` | `varchar(20)` | NULLABLE | SĐT |
 | `role_id` | `int` | FK → `roles.id`, DEFAULT `1` | Vai trò |
 | `created_at` | `timestamptz` | DEFAULT `now()` | — |
@@ -95,7 +96,6 @@ erDiagram
 | `user_id` | `uuid` | FK → `users.id`, NOT NULL | Chủ xe |
 | `vehicle_type_id` | `int` | FK → `vehicle_types.id`, NOT NULL | Loại xe |
 | `plate_number` | `varchar(20)` | UNIQUE, NOT NULL | Biển số: `59A-123.45` |
-| `brand` | `varchar(50)` | NULLABLE | Hãng xe |
 | `is_active` | `boolean` | DEFAULT `true` | Còn dùng |
 | `created_at` | `timestamptz` | DEFAULT `now()` | — |
 

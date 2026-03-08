@@ -9,10 +9,10 @@ if PROJECT_ROOT not in sys.path:
 
 from sqlalchemy.orm import Session
 from src.app.utils.supabase import SessionLocal
-from src.app.model import Role, User
+from src.app.model import Role, User,VehicleType
 
 
-def seed_data():
+def seed_data_role():
     db: Session = SessionLocal()
     
     try:
@@ -35,5 +35,28 @@ def seed_data():
     finally:
         db.close()
 
+def seed_data_vihecle_type():
+    db: Session = SessionLocal()
+
+    try: 
+        vehicle_type_data =[
+            {"name" : "motorbike", "display_name" : "Xe máy", "icon" : "🏍️" },
+            {"name" : "car", "display_name" : "Ô tô", "icon" : "🚗" },
+            {"name" : "electric", "display_name" : "Xe điện", "icon" : "⚡" }
+        ]
+        for r_data in vehicle_type_data:
+            existing_vehicle_type = db.query(VehicleType).filter(VehicleType.name == r_data["name"]).first()
+            if not existing_vehicle_type:
+                new_vehicle_type = VehicleType(**r_data)
+                db.add(new_vehicle_type)
+                print(f"✅ Đã tạo vehicle_type: {r_data['name']}")
+        db.commit()
+
+    except Exception as e:
+        db.rollback()
+        print(f"❌ Lỗi khi chèn dữ liệu mẫu: {e}")
+    finally:
+        db.close()
 if __name__ == "__main__":
-    seed_data()
+    seed_data_role()
+    seed_data_vihecle_type()

@@ -5,6 +5,8 @@ from src.app.core.cors import setup_cors
 from src.app.core.rate_limit import setup_rate_limit
 from src.app.core.auth_middleware import JWTAuthMiddleware
 from src.app.api.auth import router as auth_router
+from src.app.api.vehicle import router as vehicle_router
+from src.app.api.admin import router as admin_router
 from src.app.core.dependencies import security
 
 load_dotenv()
@@ -25,6 +27,8 @@ def create_app() -> FastAPI:
     app.add_middleware(JWTAuthMiddleware)
 
     app.include_router(auth_router, prefix="/api/v1")
+    app.include_router(vehicle_router, prefix="/api/v1")
+    app.include_router(admin_router, prefix="/api/v1")
 
     @app.get("/", tags=["Health"])
     def health_check():

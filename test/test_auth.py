@@ -23,7 +23,7 @@ def test_register_success(client: TestClient, shared_test_data: dict):
     data = response.json()
     assert data["email"] == user_data["email"]
     assert data["full_name"] == user_data["full_name"]
-    assert "id" in data
+    assert "role_name" in data
 
 
 def test_register_duplicate_email(client: TestClient, shared_test_data: dict):
