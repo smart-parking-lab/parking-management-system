@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from fastapi import HTTPException
 
 from src.app.model import User,Role
-from src.app.schemas.auth import RegisterRequest, LoginRequest, TokenResponse, UserResponse
+from src.app.schemas.auth import RegisterRequest, LoginRequest, TokenResponse, UserResponse, UPdatedProfileRequest
 from src.app.core.security import create_access_token, create_refresh_token, verify_refresh_token
 
 
@@ -106,3 +106,40 @@ def refresh_access_token(db: Session, refresh_token: str) -> dict:
         "access_token": access_token,
         "token_type": "bearer"
     }
+
+def update_profile(db: Session, user_id: str, payload: UPdatedProfileRequest) -> UserResponse:
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User không tồn tại")
+
+    has_changes = False
+    
+    if payload.email != user.email:
+        existing_email = db.query(User).filter(User.email == payload.email, User.id != user_id).first()
+        if existing_email:
+            raise HTTPException(status_code=400, detail="Email đã được sử dụng")
+        user.email = payload.email
+        has_changes = True
+        
+    if payload.full_name != user.full_name:
+        user.full_name = payload.full_name
+        has_changes = True
+        
+    if payload.phone != user.phone:
+        user.phone = payload.phone
+        has_changes = True
+        
+    if not has_changes:
+        raise HTTPException(status_code=400, detail="Không có thông tin nào mới để cập nhật")
+        
+    db.commit()
+    db.refresh(user)
+    
+    role = db.query(Role).filter(Role.id == user.role_id).first()
+    
+    return UserResponse(
+        email=user.email,
+        full_name=user.full_name,
+        phone=user.phone,
+        role_name=role.name if role else None
+    )
