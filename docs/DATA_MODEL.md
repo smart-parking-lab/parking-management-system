@@ -13,25 +13,13 @@
 ```mermaid
 erDiagram
     ROLES ||--o{ USERS : "has"
-    USERS ||--o{ VEHICLES : "owns"
-    USERS ||--o{ BOOKINGS : "books"
-    USERS ||--o{ TRANSACTIONS : "makes"
 
-    VEHICLE_TYPES ||--o{ VEHICLES : "classifies"
-    VEHICLE_TYPES ||--o{ PARKING_SLOTS : "accepts"
-    VEHICLE_TYPES ||--o{ PRICING_RULES : "prices"
-
-    PARKING_SLOTS ||--o{ BOOKINGS : "reserved by"
-    PARKING_SLOTS ||--o{ PARKING_SESSIONS : "hosts"
     PARKING_SLOTS ||--o{ SLOT_LOGS : "logs"
 
     SENSORS ||--|| PARKING_SLOTS : "monitors"
 
-    VEHICLES ||--o{ BOOKINGS : "for"
-    VEHICLES ||--o{ PARKING_SESSIONS : "parks"
 
     PARKING_SESSIONS ||--o| INVOICES : "generates"
-    INVOICES ||--o| TRANSACTIONS : "paid by"
     PRICING_RULES ||--o{ INVOICES : "applies"
 ```
 
@@ -52,27 +40,6 @@ erDiagram
 | 1 | `user` | Người dùng thường |
 | 2 | `admin` | Quản trị viên |
 
-### `vehicle_types` — Loại xe
-
-| Column | Type | Constraints | Mô tả |
-|--------|------|------------|--------|
-| `id` | `serial` | PK | Auto-increment |
-| `name` | `varchar(20)` | UNIQUE, NOT NULL | `motorbike`, `car`, `electric` |
-| `display_name` | `varchar(50)` | NOT NULL | `Xe máy`, `Ô tô`, `Xe điện` |
-| `icon` | `varchar(10)` | NULLABLE | Emoji: `🏍️`, `🚗`, `⚡` |
-
-**Seed data:**
-
-| id | name | display_name | icon |
-|----|------|-------------|------|
-| 1 | `motorbike` | Xe máy | 🏍️ |
-| 2 | `car` | Ô tô | 🚗 |
-| 3 | `electric` | Xe điện | ⚡ |
-
----
-
-## 3. Bảng Chính
-
 ### `users` — Người dùng (Profile)
 
 > ⚠️ Password do Supabase Auth quản lý. Bảng này chỉ lưu thông tin profile.
@@ -88,17 +55,6 @@ erDiagram
 | `created_at` | `timestamptz` | DEFAULT `now()` | — |
 | `updated_at` | `timestamptz` | DEFAULT `now()` | — |
 
-### `vehicles` — Xe
-
-| Column | Type | Constraints | Mô tả |
-|--------|------|------------|--------|
-| `id` | `uuid` | PK | — |
-| `user_id` | `uuid` | FK → `users.id`, NOT NULL | Chủ xe |
-| `vehicle_type_id` | `int` | FK → `vehicle_types.id`, NOT NULL | Loại xe |
-| `plate_number` | `varchar(20)` | UNIQUE, NOT NULL | Biển số: `59A-123.45` |
-| `brand` | `varchar(50)` | NULLABLE | Hãng xe |
-| `is_active` | `boolean` | DEFAULT `true` | Còn dùng |
-| `created_at` | `timestamptz` | DEFAULT `now()` | — |
 
 ### `parking_slots` — Ô đỗ xe
 
@@ -106,8 +62,7 @@ erDiagram
 |--------|------|------------|--------|
 | `id` | `uuid` | PK | — |
 | `slot_code` | `varchar(10)` | UNIQUE, NOT NULL | `A01`, `B12` |
-| `vehicle_type_id` | `int` | FK → `vehicle_types.id`, NOT NULL | Loại xe chấp nhận |
-| `status` | `varchar(20)` | DEFAULT `'available'` | `available` · `occupied` · `reserved` · `maintenance` |
+| `status` | `varchar(20)` | DEFAULT `'available'` | `available` · `occupied` · `maintenance` |
 | `zone` | `varchar(5)` | NOT NULL | Khu vực: `A`, `B`, `C` |
 | `floor` | `int` | DEFAULT `1` | Tầng |
 | `position_x` | `int` | NULLABLE | Tọa độ X trên sơ đồ |
@@ -127,27 +82,11 @@ erDiagram
 | `last_heartbeat` | `timestamptz` | NULLABLE | Lần heartbeat cuối |
 | `created_at` | `timestamptz` | DEFAULT `now()` | — |
 
-### `bookings` — Đặt chỗ trước
-
-| Column | Type | Constraints | Mô tả |
-|--------|------|------------|--------|
-| `id` | `uuid` | PK | — |
-| `user_id` | `uuid` | FK → `users.id`, NOT NULL | Người đặt |
-| `vehicle_id` | `uuid` | FK → `vehicles.id`, NOT NULL | Xe nào đặt |
-| `slot_id` | `uuid` | FK → `parking_slots.id`, NOT NULL | Ô đỗ |
-| `status` | `varchar(20)` | DEFAULT `'pending'` | `pending` · `confirmed` · `cancelled` · `expired` |
-| `booked_from` | `timestamptz` | NOT NULL | Bắt đầu giữ chỗ |
-| `booked_until` | `timestamptz` | NOT NULL | Hết hạn giữ chỗ |
-| `cancelled_at` | `timestamptz` | NULLABLE | Thời điểm hủy |
-| `created_at` | `timestamptz` | DEFAULT `now()` | — |
-
 ### `parking_sessions` — Phiên đỗ xe
 
 | Column | Type | Constraints | Mô tả |
 |--------|------|------------|--------|
 | `id` | `uuid` | PK | — |
-| `slot_id` | `uuid` | FK → `parking_slots.id`, NOT NULL | Ô đỗ |
-| `vehicle_id` | `uuid` | FK → `vehicles.id`, NULLABLE | NULL = xe vãng lai |
 | `plate_number` | `varchar(20)` | NOT NULL | Biển số nhận diện |
 | `entry_time` | `timestamptz` | NOT NULL | Giờ vào |
 | `exit_time` | `timestamptz` | NULLABLE | NULL = đang đỗ |
@@ -161,7 +100,6 @@ erDiagram
 | Column | Type | Constraints | Mô tả |
 |--------|------|------------|--------|
 | `id` | `uuid` | PK | — |
-| `vehicle_type_id` | `int` | FK → `vehicle_types.id`, NOT NULL | Áp dụng cho loại xe nào |
 | `name` | `varchar(50)` | NOT NULL | `Giờ thường`, `Qua đêm`, `Cuối tuần` |
 | `price_per_hour` | `decimal(10,2)` | NOT NULL | Giá/giờ (VNĐ) |
 | `price_per_day` | `decimal(10,2)` | NULLABLE | Giá trọn ngày |
@@ -175,7 +113,7 @@ erDiagram
 | `created_at` | `timestamptz` | DEFAULT `now()` | — |
 
 > [!TIP]
-> **Logic chọn pricing rule**: Khi tính giá, hệ thống tìm rule matching (vehicle_type + khung giờ + ngày trong tuần), sort theo `priority` DESC, lấy rule đầu tiên. Nếu không match rule nào → dùng rule mặc định (priority = 0).
+> **Logic chọn pricing rule**: Hệ thống MVP mặc định áp dụng cho ô tô/xe máy giống nhau, tìm rule matching (khung giờ + ngày trong tuần), sort theo `priority` DESC, lấy rule đầu tiên. Nếu không match rule nào → dùng rule mặc định (priority = 0).
 
 ### `invoices` — Hóa đơn
 
@@ -188,46 +126,15 @@ erDiagram
 | `base_amount` | `decimal(12,2)` | NOT NULL | Giá gốc |
 | `total_amount` | `decimal(12,2)` | NOT NULL | Tổng tiền |
 | `status` | `varchar(20)` | DEFAULT `'pending'` | `pending` · `paid` · `cancelled` |
-| `created_at` | `timestamptz` | DEFAULT `now()` | — |
-
-### `transactions` — Giao dịch
-
-| Column | Type | Constraints | Mô tả |
-|--------|------|------------|--------|
-| `id` | `uuid` | PK | — |
-| `user_id` | `uuid` | FK → `users.id` | Người thực hiện |
-| `invoice_id` | `uuid` | FK → `invoices.id`, NULLABLE | NULL nếu nạp tiền |
-| `type` | `varchar(20)` | NOT NULL | `payment` · `top_up` · `refund` |
-| `amount` | `decimal(12,2)` | NOT NULL | Số tiền |
-| `method` | `varchar(20)` | NOT NULL | `wallet` · `vnpay` · `momo` · `cash` |
-| `status` | `varchar(20)` | DEFAULT `'pending'` | `pending` · `success` · `failed` |
-| `external_transaction_id` | `varchar(100)` | NULLABLE | ID từ VNPay/Momo |
+| `payment_method` | `varchar(20)` | NULLABLE | `cash` · `vnpay` · `momo` (NULL nếu chưa trả) |
+| `paid_at` | `timestamptz` | NULLABLE | Thời điểm thanh toán |
 | `created_at` | `timestamptz` | DEFAULT `now()` | — |
 
 ---
 
 ## 4. Bảng Log
 
-### `sensor_logs` — Log dữ liệu cảm biến
 
-| Column | Type | Constraints | Mô tả |
-|--------|------|------------|--------|
-| `id` | `uuid` | PK | — |
-| `sensor_id` | `uuid` | FK → `sensors.id` | — |
-| `raw_value` | `int` | NOT NULL | Giá trị thô |
-| `processed_value` | `int` | NOT NULL | `0` = trống, `1` = có xe |
-| `recorded_at` | `timestamptz` | DEFAULT `now()` | — |
-
-### `slot_logs` — Log thay đổi trạng thái ô đỗ
-
-| Column | Type | Constraints | Mô tả |
-|--------|------|------------|--------|
-| `id` | `uuid` | PK | — |
-| `slot_id` | `uuid` | FK → `parking_slots.id` | — |
-| `old_status` | `varchar(20)` | NOT NULL | — |
-| `new_status` | `varchar(20)` | NOT NULL | — |
-| `trigger_source` | `varchar(20)` | NOT NULL | `sensor` · `booking` · `manual` |
-| `changed_at` | `timestamptz` | DEFAULT `now()` | — |
 
 ### `gate_logs` — Log cổng ra/vào
 
@@ -249,13 +156,11 @@ erDiagram
 |------|-------|---------|-------|
 | `parking_slots` | `idx_slots_status` | `status` | Tìm ô trống |
 | `parking_slots` | `idx_slots_zone` | `zone, floor` | Lọc theo khu |
-| `parking_sessions` | `idx_sessions_active` | `status, slot_id` | Session đang active |
+| `parking_sessions` | `idx_sessions_active` | `status` | Session đang active |
 | `parking_sessions` | `idx_sessions_plate` | `plate_number` | Tìm theo biển số |
-| `bookings` | `idx_bookings_user` | `user_id, status` | Lịch sử user |
-| `bookings` | `idx_bookings_slot` | `slot_id, status` | Kiểm tra ô đã đặt |
-| `transactions` | `idx_tx_user` | `user_id, created_at` | Lịch sử giao dịch |
+| `invoices` | `idx_invoices_status` | `status, created_at` | Lọc hóa đơn chờ/đã thu |
 | `sensors` | `idx_sensors_status` | `status` | Tìm offline |
-| `pricing_rules` | `idx_pricing_active` | `vehicle_type_id, is_active, priority` | Tìm rule nhanh |
+| `pricing_rules` | `idx_pricing_active` | `is_active, priority` | Tìm rule nhanh |
 
 ---
 
@@ -276,11 +181,8 @@ Bật Realtime cho các bảng cần cập nhật real-time:
 | Bảng | SELECT | INSERT/UPDATE/DELETE |
 |------|--------|---------------------|
 | `users` | Chỉ xem profile mình | Chỉ sửa profile mình |
-| `vehicles` | Chỉ xem xe mình | Chỉ CRUD xe mình |
-| `bookings` | Chỉ xem booking mình | Chỉ tạo/hủy booking mình |
-| `transactions` | Chỉ xem giao dịch mình | System only |
 | `parking_slots` | Tất cả | Admin only |
-| `invoices` | Xem hóa đơn mình | System only |
+| `invoices` | Xem hóa đơn mình / Admin xem tất cả | System only |
 | `sensors` | Admin only | Admin only |
 | `pricing_rules` | Tất cả (đọc giá) | Admin only |
 
@@ -291,27 +193,21 @@ Bật Realtime cho các bảng cần cập nhật real-time:
 <details>
 <summary>📌 Pricing Rules</summary>
 
-| vehicle_type | name | price/h | min_charge | apply_after | days | priority |
-|-------------|------|---------|------------|-------------|------|----------|
-| Xe máy | Giờ thường | 5,000 | 3,000 | 15 phút | MON-FRI | 1 |
-| Xe máy | Qua đêm | 10,000 | 10,000 | 0 | ALL | 0 |
-| Xe máy | Cuối tuần | 7,000 | 5,000 | 15 phút | SAT-SUN | 2 |
-| Ô tô | Giờ thường | 20,000 | 10,000 | 15 phút | MON-FRI | 1 |
-| Ô tô | Qua đêm | 40,000 | 40,000 | 0 | ALL | 0 |
-| Ô tô | Cuối tuần | 25,000 | 15,000 | 15 phút | SAT-SUN | 2 |
-| Xe điện | Giờ thường | 15,000 | 8,000 | 15 phút | ALL | 1 |
+| name | price/h | min_charge | apply_after | days | priority |
+|------|---------|------------|-------------|------|----------|
+| Giờ thường | 5,000 | 3,000 | 15 phút | MON-FRI | 1 |
+| Qua đêm | 10,000 | 10,000 | 0 | ALL | 0 |
+| Cuối tuần | 7,000 | 5,000 | 15 phút | SAT-SUN | 2 |
 
 </details>
 
 <details>
 <summary>📌 Parking Slots (20 ô mẫu)</summary>
 
-| slot_code | vehicle_type | zone | floor |
-|-----------|-------------|------|-------|
-| A01 – A05 | Xe máy | A | 1 |
-| A06 – A10 | Xe máy | A | 1 |
-| B01 – B05 | Ô tô | B | 1 |
-| B06 – B10 | Ô tô | B | 1 |
+| slot_code | zone | floor |
+|-----------|------|-------|
+| A01 – A10 | A | 1 |
+| B01 – B10 | B | 1 |
 
 </details>
 

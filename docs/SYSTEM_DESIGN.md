@@ -47,11 +47,11 @@ graph TB
 ```mermaid
 graph TD
     subgraph "API Layer"
-        API[Routers: auth - slots - bookings<br/>payments - sensors - gates - reports]
+        API[Routers: auth - slots - payments<br/>sensors - gates - reports]
     end
 
     subgraph "Service Layer"
-        SVC[Services: Auth - SlotManager - Booking<br/>Pricing - Billing - Payment - Gate - Report]
+        SVC[Services: Auth - SlotManager - Pricing<br/>Billing - Payment - Gate - Report]
     end
 
     subgraph "Data Acquisition"
@@ -192,47 +192,7 @@ sequenceDiagram
     FE-->>U: Đăng nhập thành công ✅
 ```
 
-### 6.2 Luồng Đặt Chỗ Trước
 
-```mermaid
-sequenceDiagram
-    actor U as 👤 User
-    participant FE as 📱 Frontend
-    participant API as 🌐 FastAPI
-    participant BOOK as 📋 Booking Service
-    participant SLOT as 🅿️ Slot Manager
-    participant DB as 🗄️ Database
-    participant TIMER as ⏰ Background Task
-
-    U->>FE: Chọn ô đỗ + thời gian
-    FE->>API: POST /api/v1/bookings
-    API->>BOOK: create_booking(user_id, slot_id, time)
-    BOOK->>SLOT: check_slot_available(slot_id)
-    SLOT->>DB: SELECT status FROM slots WHERE id = ?
-    
-    alt Ô đỗ trống
-        DB-->>SLOT: status = 'available'
-        SLOT-->>BOOK: ✅ Available
-        BOOK->>DB: INSERT booking (status='pending')
-        BOOK->>DB: UPDATE slot SET status='reserved'
-        BOOK->>TIMER: Schedule auto-cancel sau 15 phút
-        BOOK-->>API: BookingResponse
-        API-->>FE: 201 Created
-        FE-->>U: Đặt chỗ thành công ✅
-
-        Note over TIMER,DB: Nếu quá 15 phút mà xe chưa đến
-        TIMER->>DB: UPDATE booking SET status='cancelled'
-        TIMER->>DB: UPDATE slot SET status='available'
-    else Ô đỗ đã có người
-        DB-->>SLOT: status = 'occupied'
-        SLOT-->>BOOK: ❌ Not available
-        BOOK-->>API: raise ConflictException
-        API-->>FE: 409 Conflict
-        FE-->>U: Ô đỗ đã có người ❌
-    end
-```
-
----
 
 ## 7. Error Handling Strategy
 

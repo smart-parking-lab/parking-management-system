@@ -27,8 +27,8 @@ graph LR
 ```mermaid
 graph TD
     REQ[Request] --> MW[🔒 Middleware<br/>CORS → Rate Limit → JWT]
-    MW --> API[🌐 API Routers<br/>auth · slots · bookings · payments · sensors · gates · reports]
-    API --> SVC[🧠 Services<br/>Auth · SlotManager · Booking · Pricing · Billing · Payment · Gate · Report]
+    MW --> API[🌐 API Routers<br/>auth · slots · payments · sensors · gates · reports]
+    API --> SVC[🧠 Services<br/>Auth · SlotManager · Pricing · Billing · Payment · Gate · Report]
     SVC --> DATA[🗄️ Data Layer<br/>SQLAlchemy ORM + Supabase Client]
     DATA --> DB[(PostgreSQL)]
 
@@ -96,8 +96,8 @@ sequenceDiagram
 
     LPR->>BE: POST /gates/entry {plate, image}
     BE->>DB: Tìm xe đã đăng ký?
-    alt Có đăng ký / đặt chỗ
-        BE->>DB: Tạo parking_session
+    alt Xe đã đăng ký (user/vé tháng)
+        BE->>DB: Tạo parking_session (gắn vehicle_id)
         BE-->>LPR: ✅ Mở barie
     else Xe vãng lai
         BE->>DB: Tạo session (guest)
@@ -116,8 +116,12 @@ sequenceDiagram
     LPR->>BE: POST /gates/exit {plate}
     BE->>DB: Tìm session active
     BE->>BE: Tính phí (PricingEngine)
-    BE->>DB: Tạo invoice + transaction
-    BE-->>LPR: ✅ Mở barie + số tiền
+    BE->>DB: Tạo invoice (status='pending')
+    BE-->>LPR: Phản hồi số tiền
+    
+    Note over LPR,DB: --- Thu ngân thu tiền / quẹt VNPay xong ---
+    BE->>DB: Update invoice (status='paid', paid_at)
+    BE-->>LPR: ✅ Mở barie
 ```
 
 ---
@@ -142,7 +146,6 @@ register_error_handlers(app)
 # Routers
 app.include_router(auth.router,     prefix="/api/v1/auth")
 app.include_router(slots.router,    prefix="/api/v1/slots")
-app.include_router(bookings.router, prefix="/api/v1/bookings")
 app.include_router(payments.router, prefix="/api/v1/payments")
 app.include_router(sensors.router,  prefix="/api/v1/sensors")
 app.include_router(gates.router,    prefix="/api/v1/gates")
@@ -173,24 +176,13 @@ app.include_router(reports.router,  prefix="/api/v1/reports")
 | `DELETE` | `/{id}` | Xóa | ✅ Admin |
 | `GET` | `/stats` | Thống kê trống/đầy | ✅ |
 
-### Bookings (`/api/v1/bookings`)
-
-| Method | Path | Mô tả | Auth |
-|--------|------|--------|------|
-| `POST` | `/` | Đặt chỗ | ✅ |
-| `GET` | `/` | Lịch sử đặt chỗ | ✅ |
-| `GET` | `/{id}` | Chi tiết | ✅ |
-| `POST` | `/{id}/cancel` | Hủy | ✅ |
-
-### Payments (`/api/v1/payments`)
+### Payments / Invoices (`/api/v1/payments`)
 
 | Method | Path | Mô tả | Auth |
 |--------|------|--------|------|
 | `GET` | `/invoices` | Danh sách hóa đơn | ✅ |
 | `GET` | `/invoices/{id}` | Chi tiết hóa đơn | ✅ |
-| `POST` | `/invoices/{id}/pay` | Thanh toán | ✅ |
-| `GET` | `/transactions` | Lịch sử giao dịch | ✅ |
-| `POST` | `/wallet/top-up` | Nạp ví | ✅ |
+| `POST` | `/invoices/{id}/pay` | Call khi thu tiền xong (để update status='paid') | ✅ |
 
 ### Sensors (`/api/v1/sensors`)
 

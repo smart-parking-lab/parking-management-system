@@ -26,7 +26,7 @@ Xây dựng hệ thống **tự động hóa toàn bộ quy trình** quản lý 
 Cảm biến hồng ngoại + ESP32  →  Phát hiện xe tự động
 Camera + Nhận diện biển số    →  Kiểm soát ra/vào tự động
 Backend + Database            →  Quản lý & tính phí tự động
-Mobile/Web App                →  Đặt chỗ & thanh toán online
+Mobile/Web App                →  Xem bãi xe real-time & tra cứu
 ```
 
 ---
@@ -37,9 +37,9 @@ Mobile/Web App                →  Đặt chỗ & thanh toán online
 mindmap
   root((Smart Parking))
     🚗 Người lái xe
-      Tìm & đặt chỗ đỗ
-      Thanh toán online
-      Xem lịch sử
+      Tìm ô đỗ trống nhanh
+      Thanh toán thuận tiện
+      Xem lịch sử (sau MVP)
     👨‍💼 Quản lý bãi
       Theo dõi real-time
       Xem báo cáo doanh thu
@@ -56,7 +56,7 @@ mindmap
 
 | Stakeholder | Vai trò | Nhu cầu chính |
 |-------------|---------|---------------|
-| **Người lái xe** | End user | Tìm chỗ nhanh, đặt trước, thanh toán tiện lợi |
+| **Người lái xe** | End user | Tìm chỗ nhanh, xem sơ đồ live, thanh toán tiện lợi |
 | **Quản lý bãi** | Operator | Theo dõi trạng thái real-time, xử lý sự cố |
 | **Chủ bãi xe** | Business owner | Tối ưu doanh thu, báo cáo, mở rộng |
 | **Kỹ thuật viên** | Maintenance | Giám sát thiết bị, bảo trì phần cứng |
@@ -89,7 +89,7 @@ graph LR
 | G1 | **Tự động phát hiện xe** trong ô đỗ | Độ chính xác cảm biến ≥ 95% |
 | G2 | **Tự động kiểm soát ra/vào** bằng biển số | Thời gian xử lý ≤ 5 giây/xe |
 | G3 | **Tính phí tự động** dựa trên thời gian đỗ | 0% sai lệch so với thực tế |
-| G4 | **Đặt chỗ trước** qua app/web | Tỷ lệ đặt chỗ thành công ≥ 99% |
+| G4 | **Tra cứu trạng thái** bãi đỗ qua web | Web load và render map ≤ 2s |
 | G5 | **Dashboard real-time** cho quản lý | Cập nhật trạng thái ≤ 3 giây |
 | G6 | **Thanh toán online** (VNPay/Momo) | Hỗ trợ ≥ 2 cổng thanh toán |
 | G7 | **Báo cáo doanh thu** tự động | Xuất báo cáo ngày/tháng/năm |
@@ -121,10 +121,9 @@ graph TB
         P3[Pricing Engine — Tính giá]
     end
 
-    subgraph "👤 Người dùng & Đặt chỗ"
-        U1[Auth — Đăng ký/Đăng nhập]
-        U2[Profile — Quản lý thông tin]
-        U3[Booking — Đặt chỗ trước]
+    subgraph "👤 Người dùng"
+        U1[Auth — Đăng nhập Admin]
+        U2[Profile — Dành cho phase sau MVP]
     end
 
     subgraph "💳 Thanh toán"
@@ -143,7 +142,6 @@ graph TB
     S1 --> S2 --> P2
     R1 --> R2 --> R3
     R3 --> R4
-    U3 --> P1
     R4 --> PM1 --> PM2 --> PM3
 ```
 
@@ -151,6 +149,8 @@ graph TB
 
 | Tính năng | Lý do loại |
 |-----------|-----------|
+| Đặt chỗ trước (Booking) | Out of scope, giảm tải MVP. Trọng tâm là tracking & tính tiền. |
+| Tự động hủy đặt chỗ | Đi kèm booking, out of scope. |
 | Hệ thống EV charging (sạc xe điện) | Phức tạp phần cứng, ngoài scope môn học |
 | Đỗ xe tự động (autonomous parking) | Cần xe tự lái |
 | Multi-tenant (nhiều bãi xe khác nhau) | MVP chỉ 1 bãi |
@@ -174,22 +174,18 @@ graph TB
 
 | ID | Yêu cầu | Priority |
 |----|---------|----------|
-| FR-3.1 | Quản lý danh sách ô đỗ (thêm, sửa, xóa, phân loại) | 🔴 Must |
+| FR-3.1 | Quản lý danh sách ô đỗ (thêm, sửa, xóa) | 🔴 Must |
 | FR-3.2 | Cập nhật trạng thái ô đỗ real-time khi cảm biến thay đổi | 🔴 Must |
-| FR-3.3 | Hỗ trợ phân loại ô đỗ: xe máy, ô tô, xe điện | 🟡 Should |
-| FR-3.4 | Tính giá dựa trên: loại xe × khung giờ × thời gian đỗ | 🔴 Must |
+| FR-3.4 | Tính giá dựa trên: khung giờ × thời gian đỗ (Mặc định: xe máy) | 🔴 Must |
 | FR-3.5 | Hỗ trợ giá theo giờ, theo lượt, theo ngày | 🟡 Should |
 
-### Module 4 — User & Reservation 👤
+### Module 4 — User & Auth 👤
 
 | ID | Yêu cầu | Priority |
 |----|---------|----------|
-| FR-4.1 | Đăng ký tài khoản bằng email | 🔴 Must |
-| FR-4.2 | Đăng nhập / Đăng xuất an toàn (JWT) | 🔴 Must |
-| FR-4.3 | Phân quyền User / Admin | 🔴 Must |
-| FR-4.4 | User quản lý danh sách biển số xe | 🟡 Should |
-| FR-4.5 | Đặt chỗ trước, giữ chỗ trong 15 phút | 🟡 Should |
-| FR-4.6 | Tự động hủy đặt chỗ nếu quá hạn | 🟡 Should |
+| FR-4.1 | Đăng nhập an toàn (JWT) cho Admin quản trị | 🔴 Must |
+| FR-4.2 | Phân quyền User / Admin (vai trò User để sau MVP) | 🔴 Must |
+| FR-4.3 | Đăng ký & Đăng nhập cho End-User để lưu lịch sử | 🟡 Sau MVP |
 
 ### Module 5 — Payment 💳
 
@@ -263,11 +259,9 @@ graph LR
     end
 
     subgraph "Use Cases"
-        UC1[Đăng ký / Đăng nhập]
-        UC2[Tìm ô đỗ trống]
-        UC3[Đặt chỗ trước]
-        UC4[Thanh toán]
-        UC5[Xem lịch sử]
+        UC1[Đăng nhập Admin]
+        UC2[Tìm ô đỗ trống (Map)]
+        UC4[Thanh toán / Tính phí]
         UC6[Theo dõi bãi xe real-time]
         UC7[Quản lý ô đỗ]
         UC8[Xem báo cáo doanh thu]
@@ -276,12 +270,10 @@ graph LR
         UC11[Xem hóa đơn]
     end
 
-    U --> UC1
     U --> UC2
-    U --> UC3
     U --> UC4
-    U --> UC5
     U --> UC11
+    A --> UC1
     A --> UC6
     A --> UC7
     A --> UC8
@@ -307,15 +299,13 @@ sequenceDiagram
     Driver->>CAM: Đến cổng vào
     CAM->>LPR: Chụp ảnh biển số
     LPR->>BE: Gửi biển số nhận diện
-    BE->>DB: Kiểm tra đặt chỗ / đăng ký
     
-    alt Xe hợp lệ
-        DB-->>BE: ✅ Có đặt chỗ
+    alt Xe hợp lệ (không bị blacklist)
+        BE->>DB: Tạo parking_session (lưu biển số, giờ vào)
         BE->>Gate: Mở barie
         Gate-->>Driver: Barie mở
-        BE->>DB: Ghi log xe vào + timestamp
-    else Xe không hợp lệ
-        DB-->>BE: ❌ Không tìm thấy
+        BE->>DB: Ghi log cổng vào
+    else Xe bị blacklist / vô lệ
         BE->>Gate: Giữ barie đóng
         Gate-->>Driver: Barie đóng + thông báo
     end

@@ -33,7 +33,6 @@ parking-management-system/
 │   ├── 📂 models/                   # 🗄️ SQLAlchemy ORM models
 │   │   ├── user.py                  # Bảng users
 │   │   ├── slot.py                  # Bảng parking_slots
-│   │   ├── booking.py               # Bảng bookings
 │   │   ├── payment.py               # Bảng payments
 │   │   ├── sensor.py                # Bảng sensors
 │   │   └── gate_log.py              # Bảng gate_logs
@@ -41,7 +40,6 @@ parking-management-system/
 │   ├── 📂 schemas/                  # 📋 Pydantic request/response
 │   │   ├── auth.py                  # Login, Register schemas
 │   │   ├── slot.py                  # Slot schemas
-│   │   ├── booking.py               # Booking schemas
 │   │   ├── payment.py               # Payment schemas
 │   │   ├── sensor.py                # Sensor data schemas
 │   │   └── gate.py                  # Gate event schemas
@@ -49,7 +47,6 @@ parking-management-system/
 │   ├── 📂 api/v1/                   # 🌐 API Routers
 │   │   ├── auth.py                  # /api/v1/auth/*
 │   │   ├── slots.py                 # /api/v1/slots/*
-│   │   ├── bookings.py              # /api/v1/bookings/*
 │   │   ├── payments.py              # /api/v1/payments/*
 │   │   ├── sensors.py               # /api/v1/sensors/*
 │   │   ├── gates.py                 # /api/v1/gates/*
@@ -58,7 +55,6 @@ parking-management-system/
 │   ├── 📂 services/                 # 🧠 Business logic
 │   │   ├── auth_service.py          # Logic đăng ký, đăng nhập
 │   │   ├── slot_manager.py          # Quản lý ô đỗ
-│   │   ├── booking_service.py       # Logic đặt chỗ
 │   │   ├── pricing_engine.py        # Tính giá
 │   │   ├── billing_service.py       # Tạo hóa đơn
 │   │   ├── payment_service.py       # Thanh toán VNPay/Momo
@@ -86,7 +82,6 @@ parking-management-system/
     ├── conftest.py                  # Fixtures chung
     ├── test_auth.py
     ├── test_slots.py
-    ├── test_bookings.py
     └── test_payments.py
 ```
 
