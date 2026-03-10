@@ -123,8 +123,7 @@ erDiagram
 | `session_id` | `uuid` | FK → `parking_sessions.id`, UNIQUE | 1 session → 1 invoice |
 | `pricing_rule_id` | `uuid` | FK → `pricing_rules.id` | Rule đã áp dụng |
 | `duration_minutes` | `decimal(8,2)` | NOT NULL | Thời gian đỗ (phút) |
-| `base_amount` | `decimal(12,2)` | NOT NULL | Giá gốc |
-| `total_amount` | `decimal(12,2)` | NOT NULL | Tổng tiền |
+| `amount` | `decimal(12,2)` | NOT NULL | Tổng tiền cần thu |
 | `status` | `varchar(20)` | DEFAULT `'pending'` | `pending` · `paid` · `cancelled` |
 | `payment_method` | `varchar(20)` | NULLABLE | `cash` · `vnpay` · `momo` (NULL nếu chưa trả) |
 | `paid_at` | `timestamptz` | NULLABLE | Thời điểm thanh toán |
