@@ -80,7 +80,7 @@ gantt
 
 | Sprint | Chính (IoT, UI) | Tùng (Parking Core) | Hùng (LPR, User) | Chiến (Payment) | Bằng (Camera, Gate) |
 |--------|-----------------|---------------------|------------------|-----------------|---------------------|
-| **Setup** | Cấu hình DB, MQTT | Models (Slot) | Admin Auth Mdl | Models (Invoice)| Set up camera/LPR |
+| **Setup** |Cấu hình MQTT | Models (Slot) |Cấu hình DB, Admin Auth Mdl |Cấu hình DB, Models (Invoice)| Set up camera/LPR |
 | **Sp. 1** | MQTT Listener, ESP32| QL Ô đỗ CRUD | Admin Auth API | Cấu hình giá | LPR module core |
 | **Sp. 2** | Tích hợp OLED/Loa | Real-time map API | API Xe vào/ra | Pricing Engine | LPR tích hợp Server|
 | **Sp. 3** | UI: Sơ đồ Real-time | Fix lỗi Core | LPR Exception | Tạo Hóa Đơn | Điều khiển Barie |
