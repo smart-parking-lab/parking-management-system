@@ -1,8 +1,7 @@
-from .base import Base
-from .user import User
-from .roles import Role
-from .vehicle_type import VehicleType
-from .vehicle import Vehicle    
+from app.model.user import User
+from app.model.roles import Role
+from app.model.vehicle_type import VehicleType
+from app.model.vehicle import Vehicle
 
 __all__ = ["Base", "User", "Role", "VehicleType", "Vehicle"]
 

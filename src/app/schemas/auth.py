@@ -1,7 +1,7 @@
 from pydantic import BaseModel, EmailStr, field_validator, ConfigDict
 from typing import Optional
 
-from src.app.validators.auth_validator import (
+from app.validators.auth_validator import (
     validate_password_register,
     validate_password_login,
     validate_full_name,

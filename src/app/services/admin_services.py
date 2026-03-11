@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
-from src.app.model import Role, User, VehicleType, Vehicle
-from src.app.schemas.admin import RoleResponse, AdminUserResponse, VehicleTypeResponse, AdminVehicleResponse
+from app.model import Role, User, VehicleType, Vehicle
+from app.schemas.admin import RoleResponse, AdminUserResponse, VehicleTypeResponse, AdminVehicleResponse
 from fastapi import HTTPException
 
 def check_admin(db: Session, user_id: str):

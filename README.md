@@ -71,8 +71,13 @@ cp .env.example .env
 # Chỉnh sửa .env với thông tin Supabase & MQTT
 
 # Chạy dev server
-uv run fastapi dev src/app/main.py
+uv run python main.py
 ```
+
+Sau khi chạy xong, bạn có thể truy cập:
+- **API URL:** `http://127.0.0.1:9000`
+- **Swagger UI:** `http://127.0.0.1:9000/docs`
+- **ReDoc UI:** `http://127.0.0.1:9000/redoc`
 
 👉 Xem chi tiết tại [**docs/GETTING_STARTED.md**](docs/GETTING_STARTED.md)
 

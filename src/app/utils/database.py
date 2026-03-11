@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from .supabase import SessionLocal
+from app.utils.supabase import SessionLocal
 
 
 def get_db():

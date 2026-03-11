@@ -2,7 +2,7 @@ from pydantic import BaseModel, Field,field_validator, ConfigDict
 from typing import Optional
 from uuid import UUID
 from datetime import datetime
-from src.app.validators.vehicle_validator import validate_plate_number
+from app.validators.vehicle_validator import validate_plate_number
 
 
 class VehicleCreate(BaseModel):

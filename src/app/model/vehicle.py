@@ -2,7 +2,7 @@ import uuid
 from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, UUID, Boolean
 from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
-from .base import Base
+from app.model.base import Base
 
 class Vehicle(Base):
     __tablename__ = "vehicles"

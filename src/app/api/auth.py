@@ -1,11 +1,11 @@
 from fastapi import APIRouter, Depends, Request
 from sqlalchemy.orm import Session
 
-from src.app.schemas.auth import RegisterRequest, LoginRequest, TokenResponse, UserResponse, ChangePasswordRequest, RefreshTokenRequest, UPdatedProfileRequest
-from src.app.services import auth_services
-from src.app.utils.database import get_db
-from src.app.validators.auth_validator import http_validate_register, http_validate_login, http_validate_change_password
-from src.app.model.user import User
+from app.schemas.auth import RegisterRequest, LoginRequest, TokenResponse, UserResponse, ChangePasswordRequest, RefreshTokenRequest, UPdatedProfileRequest
+from app.services import auth_services
+from app.utils.database import get_db
+from app.validators.auth_validator import http_validate_register, http_validate_login, http_validate_change_password
+from app.model.user import User
 from fastapi import HTTPException
 
 router = APIRouter(prefix="/auth", tags=["Auth"])

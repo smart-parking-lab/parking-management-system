@@ -21,10 +21,9 @@ parking-management-system/
 │
 ├── 📂 src/app/                      # Source code chính
 │   ├── main.py                      # 🚪 Entry point FastAPI
-│   ├── config.py                    # ⚙️ Settings từ .env
-│   ├── dependencies.py              # 💉 Dependency Injection
-│   │
 │   ├── 📂 core/                     # 🔒 Cross-cutting concerns
+│   │   ├── config.py                # ⚙️ Settings từ .env
+│   │   ├── dependencies.py          # 💉 Dependency Injection
 │   │   ├── cors.py                  # CORS middleware
 │   │   ├── security.py              # JWT & authentication
 │   │   ├── exceptions.py            # Custom exception classes

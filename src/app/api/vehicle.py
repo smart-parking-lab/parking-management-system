@@ -1,11 +1,11 @@
 from fastapi import APIRouter, Depends, Request
 from sqlalchemy.orm import Session
 
-from src.app.schemas.vehicle import VehicleCreate, VehicleResponse, UpdateVehicleRequest
-from src.app.services import vehicle_services
-from src.app.utils.database import get_db
-from src.app.validators import vehicle_validator
-from src.app.schemas.admin import VehicleTypeResponse
+from app.schemas.vehicle import VehicleCreate, VehicleResponse, UpdateVehicleRequest
+from app.services import vehicle_services
+from app.utils.database import get_db
+from app.validators import vehicle_validator
+from app.schemas.admin import VehicleTypeResponse
 router = APIRouter(prefix="/vehicles", tags=["Vehicles"])
 
 @router.post("", response_model=VehicleResponse, status_code=201)

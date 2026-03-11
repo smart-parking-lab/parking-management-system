@@ -1,7 +1,7 @@
 import uuid
 from sqlalchemy import Column, UUID, String, DateTime
 from sqlalchemy.sql import func
-from .base import Base
+from app.model.base import Base
 
 class Role(Base):
     __tablename__ = "roles"

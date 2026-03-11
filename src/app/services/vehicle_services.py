@@ -1,8 +1,8 @@
 from sqlalchemy.orm import Session
 from fastapi import HTTPException
-from src.app.model import Vehicle, VehicleType, User 
-from src.app.schemas.vehicle import VehicleCreate, VehicleResponse,UpdateVehicleRequest
-from src.app.schemas.admin import VehicleTypeResponse
+from app.model import Vehicle, VehicleType, User 
+from app.schemas.vehicle import VehicleCreate, VehicleResponse,UpdateVehicleRequest
+from app.schemas.admin import VehicleTypeResponse
 
 def register_vehicle(db: Session, user_id: str, payload: VehicleCreate) -> VehicleResponse:
     vehicle_type = db.query(VehicleType).filter(VehicleType.name == payload.vehicle_type_name).first()

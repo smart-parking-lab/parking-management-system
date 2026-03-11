@@ -3,9 +3,9 @@ from sqlalchemy import or_
 from sqlalchemy.orm import Session
 from fastapi import HTTPException
 
-from src.app.model import User,Role
-from src.app.schemas.auth import RegisterRequest, LoginRequest, TokenResponse, UserResponse, UPdatedProfileRequest
-from src.app.core.security import create_access_token, create_refresh_token, verify_refresh_token
+from app.model import User,Role
+from app.schemas.auth import RegisterRequest, LoginRequest, TokenResponse, UserResponse, UPdatedProfileRequest
+from app.core.security import create_access_token, create_refresh_token, verify_refresh_token
 
 
 def _hash_password(password: str) -> str:
